@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 
 URL = f"https://stackoverflow.com/jobs?q=python"
 
+#마지막 페이지번호 가져옴.
 def get_last_page():
   result = requests.get(URL)
   soup = BeautifulSoup(result.text, "html.parser")
@@ -11,6 +12,7 @@ def get_last_page():
   last_page = pages[-2].get_text(strip=True)
   return int(last_page)
 
+#채용정보
 def extract_job(html):
   title = html.find("div",{"class":"fl1"}).find("h2").find("a")["title"]
   company, location = html.find("div",{"class":"fl1"}).find("h3").find_all("span", recursive=False)
@@ -19,6 +21,7 @@ def extract_job(html):
   job_id = html['data-jobid']
   return {'title':title,'company':company,'location':location, 'apply_link':f"https://stackoverflow.com/jobs/{job_id}"}
 
+#페이지 별 채용정보 가져옴.
 def extract_jobs(last_page):
   jobs = []
   for page in range(last_page):
@@ -30,7 +33,7 @@ def extract_jobs(last_page):
       job = extract_job(result)
       jobs.append(job)
   return jobs 
-    
+  
 def get_jobs():
   last_page = get_last_page()
   jobs = extract_jobs(last_page)
